@@ -25,13 +25,6 @@ class Preview2 {
 	/** @var IPreview */
 	private $previewManager;
 
-	/** @var int */
-	private $configMaxWidth;
-	/** @var int */
-	private $configMaxHeight;
-	/** @var int */
-	private $maxScaleFactor;
-
 	public function __construct(
 		IRootFolder $rootFolder,
 		IConfig $config,
@@ -41,10 +34,6 @@ class Preview2 {
 		$this->rootFolder = $rootFolder;
 		$this->file = $file;
 		$this->previewManager = $previewManager;
-
-		$this->configMaxWidth = (int)$config->getSystemValue('preview_max_x', 2048);
-		$this->configMaxHeight = (int)$config->getSystemValue('preview_max_y', 2048);
-		$this->maxScaleFactor = (int)$config->getSystemValue('preview_max_scale_factor', 2);
 	}
 
 	/**
@@ -112,7 +101,10 @@ class Preview2 {
 
 				list($view, $path) = $this->getViewAndPath($this->file);
 
-				$preview = $provider->getThumbnail($path, $this->configMaxWidth, $this->configMaxHeight, false, $view);
+				$maxWidth = (int)$this->config->getSystemValue('preview_max_x', 2048);
+				$maxHeight = (int)$this->config->getSystemValue('preview_max_y', 2048);
+
+				$preview = $provider->getThumbnail($path, $maxWidth, $maxHeight, false, $view);
 
 				if (!($preview instanceof IImage)) {
 					continue;
