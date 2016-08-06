@@ -9,6 +9,7 @@ use OCP\Files\NotFoundException;
 use OCP\IConfig;
 use OCP\IImage;
 use OCP\IPreview;
+use OCP\Preview\IProvider;
 
 class Preview2 {
 	//the thumbnail folder
@@ -54,29 +55,32 @@ class Preview2 {
 	 *
 	 * @param int $width
 	 * @param int $height
-	 * @param bool $scaleUp
 	 * @param bool $crop
 	 * @param string $mode
-	 * @return \OCP\IImage
+	 * @return File
 	 */
 	public function getPreview($width = -1, $height = -1, $crop = false, $mode = Preview2::MODE_FILL) {
+		/*
+		 * Get the preview folder
+		 * TODO: Separate preview creation from storing previews
+		 */
 		$previewFolder = $this->getPreviewFolder();
 
+		// Get the max preview and infer the max preview sizes from that
 		$maxPreview = $this->getMaxPreview($previewFolder);
 		list($maxWidth, $maxHeight) = $this->getPreviewSize($maxPreview);
 
+		// Calculate the preview size
 		list($width, $height) = $this->calculateSize($width, $height, $crop, $mode, $maxWidth, $maxHeight);
 
-
+		// Try to get a cached preview. Else generate (and store) one
 		try {
 			$file = $this->getCachedPreview($previewFolder, $width, $height, $crop);
 		} catch (NotFoundException $e) {
 			$file = $this->generatePreview($previewFolder, $maxPreview, $width, $height, $crop, $maxWidth, $maxHeight);
 		}
 
-		$image = new \OC_Image($file->getContent());
-		$image->show();
-		//return $image;
+		return $file;
 	}
 
 	/**
@@ -87,6 +91,7 @@ class Preview2 {
 	private function getMaxPreview(Folder $previewFolder) {
 		$nodes = $previewFolder->getDirectoryListing();
 
+		/** @var File $node */
 		foreach ($nodes as $node) {
 			if (strpos($node->getName(), 'max')) {
 				return $node;
@@ -101,7 +106,7 @@ class Preview2 {
 
 			foreach ($providers as $provider) {
 				$provider = $provider();
-				if (!($provider instanceof \OCP\Preview\IProvider)) {
+				if (!($provider instanceof IProvider)) {
 					continue;
 				}
 
@@ -137,6 +142,7 @@ class Preview2 {
 	 * @param int $width
 	 * @param int $height
 	 * @param bool $crop
+	 * @return string
 	 */
 	private function generatePath($width, $height, $crop) {
 		$path = strval($width) . '-' . strval($height);
@@ -213,22 +219,6 @@ class Preview2 {
 			}
 		}
 
-		/*
-		 * Make sure the requested height and width fall within the max
-		 * of the preview.
-		 */
-		/*
-		if ($height > $maxHeight) {
-			$ratio = $height / $maxHeight;
-			$height = $maxHeight;
-			$width = $width / $ratio;
-		}
-		if ($width > $maxWidth) {
-			$ratio = $width / $maxWidth;
-			$width = $maxWidth;
-			$height = $height / $ratio;
-		}*/
-
 		if ($height !== $maxHeight && $width !== $maxWidth) {
 			/*
 			 * Scale to the nearest power of two
@@ -275,6 +265,7 @@ class Preview2 {
 	 * @param int $maxWidth,
 	 * @param int $maxHeight
 	 * @return File
+	 * @throws NotFoundException
 	 */
 	private function generatePreview(Folder $previewFolder, File $maxPreview, $width, $height, $crop, $maxWidth, $maxHeight) {
 		$previewProviders = $this->previewManager->getProviders();
@@ -285,7 +276,7 @@ class Preview2 {
 
 			foreach ($providers as $provider) {
 				$provider = $provider();
-				if (!($provider instanceof \OCP\Preview\IProvider)) {
+				if (!($provider instanceof IProvider)) {
 					continue;
 				}
 
@@ -316,9 +307,15 @@ class Preview2 {
 				return $file;
 			}
 		}
+
+		throw new NotFoundException();
 	}
 
 	/**
+	 * @param Folder $previewFolder
+	 * @param int $width
+	 * @param int $height
+	 * @param bool $crop
 	 * @return File
 	 *
 	 * @throws NotFoundException
