@@ -47,8 +47,13 @@ class Preview2 {
 	 * @param bool $crop
 	 * @param string $mode
 	 * @return File
+	 * @throws NotFoundException
 	 */
 	public function getPreview($width = -1, $height = -1, $crop = false, $mode = Preview2::MODE_FILL) {
+		if (!$this->previewManager->isMimeSupported($this->file->getMimeType())) {
+			throw new NotFoundException();
+		}
+
 		/*
 		 * Get the preview folder
 		 * TODO: Separate preview creation from storing previews
