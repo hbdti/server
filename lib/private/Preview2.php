@@ -2,6 +2,7 @@
 
 namespace OC;
 
+use OC\Files\View;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
@@ -167,7 +168,7 @@ class Preview2 {
 
 		$file = $nodes[0];
 
-		$view = new \OC\Files\View($userFolder->getPath());
+		$view = new View($userFolder->getPath());
 		$path = $userFolder->getRelativePath($file->getPath());
 
 		return [$view, $path];
@@ -186,7 +187,7 @@ class Preview2 {
 
 		/*
 		 * If we are not cropping we have to make sure the requested image
-		 * respects the asepct ratio of the original.
+		 * respects the aspect ratio of the original.
 		 */
 		if (!$crop) {
 			$ratio = $maxHeight / $maxWidth;
@@ -224,17 +225,17 @@ class Preview2 {
 			/*
 			 * Scale to the nearest power of two
 			 */
-			$pow2heigth = pow(2, ceil(log($height) / log(2)));
+			$pow2height = pow(2, ceil(log($height) / log(2)));
 			$pow2width = pow(2, ceil(log($width) / log(2)));
 
-			$ratioH = $height / $pow2heigth;
+			$ratioH = $height / $pow2height;
 			$ratioW = $width / $pow2width;
 
 			if ($ratioH < $ratioW) {
 				$width = $pow2width;
 				$height = $height / $ratioW;
 			} else {
-				$height = $pow2heigth;
+				$height = $pow2height;
 				$width = $width / $ratioH;
 			}
 		}
@@ -328,6 +329,7 @@ class Preview2 {
 		$previewRoot = $previewRoot->getParent();
 
 		try {
+			/** @var Folder $previewRoot */
 			$previewRoot = $previewRoot->get(self::THUMBNAILS_FOLDER);
 		} catch (NotFoundException $e) {
 			$previewRoot = $previewRoot->newFolder(self::THUMBNAILS_FOLDER);

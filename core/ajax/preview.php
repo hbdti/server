@@ -50,7 +50,12 @@ if ($maxX === 0 || $maxY === 0) {
 }
 
 $folder = \OC::$server->getUserFolder();
-$file = $folder->get($file);
+
+try {
+	$file = $folder->get($file);
+} catch (\OCP\Files\NotFoundException $e) {
+	return \OC_Response::setStatus(404);
+}
 
 if (!$file instanceof OCP\Files\File || !$always && !\OC::$server->getPreviewManager()->isAvailable($file)) {
 	\OC_Response::setStatus(404);
