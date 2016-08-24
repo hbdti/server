@@ -8,6 +8,7 @@ use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IConfig;
 use OCP\IImage;
+use OCP\Image;
 use OCP\IPreview;
 use OCP\Preview\IProvider;
 
@@ -24,6 +25,8 @@ class Preview2 {
 	private $file;
 	/** @var IPreview */
 	private $previewManager;
+	/** @var IConfig */
+	private $config;
 
 	public function __construct(
 		IRootFolder $rootFolder,
@@ -32,6 +35,7 @@ class Preview2 {
 		File $file
 	) {
 		$this->rootFolder = $rootFolder;
+		$this->config = $config;
 		$this->file = $file;
 		$this->previewManager = $previewManager;
 	}
@@ -265,47 +269,35 @@ class Preview2 {
 	 * @throws NotFoundException
 	 */
 	private function generatePreview(Folder $previewFolder, File $maxPreview, $width, $height, $crop, $maxWidth, $maxHeight) {
-		$previewProviders = $this->previewManager->getProviders();
-		foreach ($previewProviders as $supportedMimeType => $providers) {
-			if (!preg_match($supportedMimeType, $this->file->getMimeType())) {
-				continue;
-			}
+		$preview = new Image($maxPreview->getContent());
 
-			foreach ($providers as $provider) {
-				$provider = $provider();
-				if (!($provider instanceof IProvider)) {
-					continue;
-				}
+		if ($crop) {
+			if ($height !== $preview->height() && $width !== $preview->width()) {
+				//Resize
+				$widthR = $preview->width() / $width;
+				$heightR = $preview->height() / $height;
 
-				list($view, $path) = $this->getViewAndPath($maxPreview);
-
-				if ($crop) {
-					$preview = $provider->getThumbnail($path, $maxWidth, $maxHeight, false, $view);
+				if ($widthR > $heightR) {
+					$scaleH = $height;
+					$scaleW = $maxWidth / $heightR;
 				} else {
-					$preview = $provider->getThumbnail($path, $width, $height, false, $view);
+					$scaleH = $maxHeight / $widthR;
+					$scaleW = $width;
 				}
-
-				if (!($preview instanceof IImage)) {
-					continue;
-				}
-
-				if ($crop) {
-					$cropX = floor(abs($width - $preview->width()) * 0.5);
-					//don't crop previews on the Y axis, this sucks if it's a document.
-					//$cropY = floor(abs($y - $newPreviewHeight) * 0.5);
-					$cropY = 0;
-					$preview->crop($cropX, $cropY, $width, $height);
-				}
-
-				$path = $this->generatePath($width, $height, $crop);
-				$file = $previewFolder->newFile($path);
-				$file->putContent($preview->data());
-
-				return $file;
+				$preview->preciseResize(round($scaleW), round($scaleH));
 			}
+			$cropX = floor(abs($width - $preview->width()) * 0.5);
+			$cropY = 0;
+			$preview->crop($cropX, $cropY, $width, $height);
+		} else {
+			$preview->resize(max($width, $height));
 		}
 
-		throw new NotFoundException();
+		$path = $this->generatePath($width, $height, $crop);
+		$file = $previewFolder->newFile($path);
+		$file->putContent($preview->data());
+
+		return $file;
 	}
 
 	/**
