@@ -888,10 +888,10 @@ $(document).ready(function () {
 	$('#CheckboxStorageLocation').click(function() {
 		if ($('#CheckboxStorageLocation').is(':checked')) {
 			$("#userlist .storageLocation").show();
-			OC.AppConfig.setValue('core', 'umgmt_show_storage_location', 'true');
+			OCP.AppConfig.setValue('core', 'umgmt_show_storage_location', 'true');
 		} else {
 			$("#userlist .storageLocation").hide();
-			OC.AppConfig.setValue('core', 'umgmt_show_storage_location', 'false');
+			OCP.AppConfig.setValue('core', 'umgmt_show_storage_location', 'false');
 		}
 	});
 
@@ -902,10 +902,10 @@ $(document).ready(function () {
 	$('#CheckboxLastLogin').click(function() {
 		if ($('#CheckboxLastLogin').is(':checked')) {
 			$("#userlist .lastLogin").show();
-			OC.AppConfig.setValue('core', 'umgmt_show_last_login', 'true');
+			OCP.AppConfig.setValue('core', 'umgmt_show_last_login', 'true');
 		} else {
 			$("#userlist .lastLogin").hide();
-			OC.AppConfig.setValue('core', 'umgmt_show_last_login', 'false');
+			OCP.AppConfig.setValue('core', 'umgmt_show_last_login', 'false');
 		}
 	});
 
@@ -916,10 +916,10 @@ $(document).ready(function () {
 	$('#CheckboxEmailAddress').click(function() {
 		if ($('#CheckboxEmailAddress').is(':checked')) {
 			$("#userlist .mailAddress").show();
-			OC.AppConfig.setValue('core', 'umgmt_show_email', 'true');
+			OCP.AppConfig.setValue('core', 'umgmt_show_email', 'true');
 		} else {
 			$("#userlist .mailAddress").hide();
-			OC.AppConfig.setValue('core', 'umgmt_show_email', 'false');
+			OCP.AppConfig.setValue('core', 'umgmt_show_email', 'false');
 		}
 	});
 
@@ -930,10 +930,10 @@ $(document).ready(function () {
 	$('#CheckboxUserBackend').click(function() {
 		if ($('#CheckboxUserBackend').is(':checked')) {
 			$("#userlist .userBackend").show();
-			OC.AppConfig.setValue('core', 'umgmt_show_backend', 'true');
+			OCP.AppConfig.setValue('core', 'umgmt_show_backend', 'true');
 		} else {
 			$("#userlist .userBackend").hide();
-			OC.AppConfig.setValue('core', 'umgmt_show_backend', 'false');
+			OCP.AppConfig.setValue('core', 'umgmt_show_backend', 'false');
 		}
 	});
 
@@ -944,10 +944,10 @@ $(document).ready(function () {
 	$('#CheckboxMailOnUserCreate').click(function() {
 		if ($('#CheckboxMailOnUserCreate').is(':checked')) {
 			$("#newemail").show();
-			OC.AppConfig.setValue('core', 'umgmt_send_email', 'true');
+			OCP.AppConfig.setValue('core', 'umgmt_send_email', 'true');
 		} else {
 			$("#newemail").hide();
-			OC.AppConfig.setValue('core', 'umgmt_send_email', 'false');
+			OCP.AppConfig.setValue('core', 'umgmt_send_email', 'false');
 		}
 	});
 
