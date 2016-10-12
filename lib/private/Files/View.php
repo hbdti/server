@@ -691,6 +691,9 @@ class View {
 		$result = $this->basicOperation('unlink', $path, array('delete'));
 		if (!$result && !$this->file_exists($path)) { //clear ghost files from the cache on delete
 			$storage = $mount->getStorage();
+			if (!$storage) {
+				return false;
+			}
 			$internalPath = $mount->getInternalPath($absolutePath);
 			$storage->getUpdater()->remove($internalPath);
 			return true;
