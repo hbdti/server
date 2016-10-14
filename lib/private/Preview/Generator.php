@@ -1,6 +1,6 @@
 <?php
 
-namespace OC;
+namespace OC\Preview;
 
 use OC\Files\View;
 use OCP\Files\File;
@@ -15,7 +15,7 @@ use OCP\Image;
 use OCP\IPreview;
 use OCP\Preview\IProvider;
 
-class Preview2 {
+class Generator {
 	//the thumbnail folder
 	const THUMBNAILS_FOLDER = 'thumbnails';
 
@@ -67,7 +67,7 @@ class Preview2 {
 	 * @return ISimpleFile
 	 * @throws NotFoundException
 	 */
-	public function getPreview($width = -1, $height = -1, $crop = false, $mode = Preview2::MODE_FILL) {
+	public function getPreview($width = -1, $height = -1, $crop = false, $mode = Generator::MODE_FILL) {
 		if (!$this->previewManager->isMimeSupported($this->file->getMimeType())) {
 			throw new NotFoundException();
 		}
