@@ -75,13 +75,6 @@ $this->create('core_ajax_appconfig', '/core/ajax/appconfig.php')
 $this->create('js_config', '/core/js/oc.js')
 	->actionInclude('core/js/config.php');
 // Routing
-/*
-$this->create('core_ajax_preview', '/core/preview')
-	->actionInclude('core/ajax/preview2.php');
-$this->create('core_ajax_preview2', '/core/preview2')
-	->actionInclude('core/ajax/preview2.php');
-$this->create('core_ajax_preview', '/core/preview.png')
-	->actionInclude('core/ajax/preview2.php');*/
 $this->create('core_ajax_update', '/core/ajax/update.php')
 	->actionInclude('core/ajax/update.php');
 
